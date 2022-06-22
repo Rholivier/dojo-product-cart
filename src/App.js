@@ -10,12 +10,19 @@ const initialProductList = [
 
 const ProductRow = ({product, onChangeList}) => {
 
+  const [quantity, setQuantity] = useState(product.quantity)
+
+  const changeValue = (value) => {
+    onChangeList((prevList) => prevList.map(item => item.id === product.id ? {...product, quantity: value} : item))
+  }
+
   const handleChangeQuantity = (e) => {
-    const quantityValue=e.target.value
-    if(!quantityValue) {
-      console.log(quantityValue)
+    const quantityValue = parseInt(e.target.value)
+    if(quantityValue === 0) {
+      const confirm = window.confirm("Etes-vous sûr de bien vouloir retirer ce produit de la list")
+     return confirm && onChangeList((prevList) => prevList.filter(item => item.id !== product.id))
     }
-    onChangeList((prevList) => prevList.map(item => item.id === product.id ? {...product, quantity: quantityValue} : item))
+    changeValue(quantityValue)
   }
 
 
@@ -23,7 +30,7 @@ const ProductRow = ({product, onChangeList}) => {
     <tr>
       <td>{product.name}</td>
       <td>{product.price} €</td>
-      <td><input type="number" value={product.quantity} onChange={(e) => handleChangeQuantity(e)} /></td>
+      <td><input type="number" min="0" value={product.quantity} onChange={(e) => handleChangeQuantity(e)} /></td>
       <td>{product.price * product.quantity} €</td>
     </tr>
   );
@@ -38,13 +45,12 @@ function App() {
   const handleAddProduct = (e) => {
     e.preventDefault()
     const newProduct = {
-      id: uuidv4()/**productList.length + 1*/,
+      id: uuidv4()/** ou productList.length + 1*/,
       name: newProductName,
       price: newProductPrice,
       quantity: 1
     }
     setProductList([...productList, newProduct]) 
-    console.log(newProduct)
   }
 
   return (
